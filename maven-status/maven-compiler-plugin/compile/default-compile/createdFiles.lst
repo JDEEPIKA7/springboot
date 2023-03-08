@@ -1,0 +1,4 @@
+com\example\querymethods\model\Person.class
+com\example\querymethods\QuerymethodsApplication.class
+com\example\querymethods\controller\PersonController.class
+com\example\querymethods\repository\PersonRepository.class

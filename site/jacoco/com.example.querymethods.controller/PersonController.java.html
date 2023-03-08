@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PersonController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">querymethods</a> &gt; <a href="index.source.html" class="el_package">com.example.querymethods.controller</a> &gt; <span class="el_source">PersonController.java</span></div><h1>PersonController.java</h1><pre class="source lang-java linenums">package com.example.querymethods.controller;
+
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.querymethods.model.Person;
+import com.example.querymethods.repository.PersonRepository;
+
+@RestController
+<span class="fc" id="L27">public class PersonController {</span>
+    @Autowired
+    PersonRepository personRepository;
+
+    @GetMapping(&quot;/&quot;)
+    public @ResponseBody ResponseEntity&lt;List&lt;Person&gt;&gt; getAll() {
+<span class="nc" id="L33">        return new ResponseEntity&lt;&gt;(personRepository.findAll(), HttpStatus.OK);</span>
+    }
+
+    // @GetMapping(&quot;/getAll&quot;)
+    // public List&lt;Person&gt; getAllDetails() {
+    //     List&lt;Person&gt; person = new ArrayList&lt;Person&gt;();
+    //     personRepository.findAll().forEach(person1 -&gt; person.add(person1));
+    //     return person;
+    // }
+
+    @GetMapping(value = &quot;/persons/{id}&quot;)
+    public ResponseEntity&lt;Person&gt; getTeamById(@PathVariable(&quot;id&quot;) int id) {
+<span class="nc" id="L45">        Person user = personRepository.findById(id).orElseThrow(() -&gt; new IllegalArgumentException(&quot;Not found&quot;));</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L47">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="nc" id="L49">        return new ResponseEntity&lt;&gt;(user, HttpStatus.OK);</span>
+    }
+
+    @GetMapping(value = &quot;/personByEmail/{email}&quot;)
+    public ResponseEntity&lt;?&gt; findByEmail(@PathVariable(&quot;email&quot;) String email) {
+        try {
+<span class="nc" id="L55">            Person user = personRepository.findByEmail(email);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (user == null) {</span>
+<span class="nc" id="L57">                return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+            }
+<span class="nc" id="L59">            return new ResponseEntity&lt;&gt;(user, HttpStatus.OK);</span>
+<span class="nc" id="L60">        } catch (Exception e) {</span>
+<span class="nc" id="L61">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/person&quot;)
+    public ResponseEntity&lt;Person&gt; createTeam(@RequestBody Person user) {
+<span class="nc" id="L67">        Person actualUser = personRepository.save(user);</span>
+<span class="nc" id="L68">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L69">        return new ResponseEntity&lt;&gt;(actualUser, headers, HttpStatus.CREATED);</span>
+    }
+
+    @PutMapping(value = &quot;/person/{id}&quot;, headers = &quot;Accept=application/json&quot;)
+    public ResponseEntity&lt;Person&gt; updateUser(@PathVariable(&quot;id&quot;) int id, @RequestBody Person currentUser) {
+<span class="nc" id="L74">        Person user = personRepository.save(currentUser);</span>
+<span class="nc" id="L75">        return new ResponseEntity&lt;&gt;(user, HttpStatus.OK);</span>
+    }
+
+    @DeleteMapping(value = &quot;/persons/{id}&quot;, headers = &quot;Accept=application/json&quot;)
+    public ResponseEntity&lt;Person&gt; deleteUser(@PathVariable(&quot;id&quot;) int id) {
+<span class="nc" id="L80">        personRepository.deleteById(id);</span>
+<span class="nc" id="L81">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+    }
+
+    @GetMapping(&quot;/queryName/{name}&quot;)
+    public ResponseEntity&lt;?&gt; findByName(@PathVariable(&quot;name&quot;) String name) {
+<span class="nc" id="L86">        return new ResponseEntity&lt;&gt;(personRepository.findByName(name), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(value = &quot;/findByNameCount/{name}&quot;)
+    public ResponseEntity&lt;?&gt; findByNameCount(@PathVariable(&quot;name&quot;) String name) {
+<span class="nc" id="L91">        return new ResponseEntity&lt;&gt;(personRepository.findByNameCount(name), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(value = &quot;/findByCount/&quot;)
+    public ResponseEntity&lt;?&gt; findByCount() {
+<span class="nc" id="L96">        return new ResponseEntity&lt;&gt;(personRepository.findByCount(), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(value = &quot;/person/{field}&quot;)
+
+    public ResponseEntity&lt;List&lt;Person&gt;&gt; getSortedBy(@PathVariable String field) {
+<span class="nc" id="L102">        List&lt;Person&gt; getSize = personRepository.findAll(Sort.by(Sort.Direction.DESC, field));</span>
+<span class="nc" id="L103">        return new ResponseEntity&lt;&gt;(getSize, HttpStatus.OK);</span>
+
+    }
+
+    @GetMapping(&quot;/person/PaginationAndSorting/{offSet}/{pageSize}/{field}&quot;)
+    public ResponseEntity&lt;Page&lt;Person&gt;&gt; getDetailsWithPaginationAndSorting(@PathVariable int offSet,
+            @PathVariable int pageSize, @PathVariable String field) {
+<span class="nc" id="L110">        Page&lt;Person&gt; person = personRepository</span>
+<span class="nc" id="L111">                .findAll(PageRequest.of(offSet, pageSize).withSort(Sort.by(Sort.Direction.DESC, field)));</span>
+<span class="nc" id="L112">        return new ResponseEntity&lt;&gt;(person, HttpStatus.ACCEPTED);</span>
+    }
+
+    @GetMapping(value = &quot;/ascorder/{field}&quot;)
+    public ResponseEntity&lt;List&lt;Person&gt;&gt; getSortedByAsc(@PathVariable String field) {
+<span class="nc" id="L117">        List&lt;Person&gt; a = personRepository.findAll(Sort.by(Sort.Direction.ASC, field));</span>
+<span class="nc" id="L118">        return new ResponseEntity&lt;&gt;(a, HttpStatus.OK);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
